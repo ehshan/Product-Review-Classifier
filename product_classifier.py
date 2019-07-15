@@ -34,7 +34,7 @@ import re
 #%%
 '''Set output directory for model and eval files '''
 
-train_out = 'rain_out'
+train_out = 'train_out'
 OUTPUT_DIR = train_out
 
 #%%
@@ -63,5 +63,50 @@ def load_data_from_remote(force_download = False):
 df = load_data_from_remote()
 train, test = train_test_split(df, test_size=0.2)
 
+
+#%%
+'''Assigned input labels for BERT data'''
+
+DATA_COLUMN = 'review_body'
+LABEL_COLUMN = 'star_rating'
+label_list = [1, 2, 3, 4, 5]
+
+
+#%%
+'''Transform data into BERT readable objects'''
+
+# Use the InputExample class from BERT's run_classifier code to create examples from the data
+train_InputExamples = train.apply(lambda x: bert.run_classifier.InputExample(guid=None,
+                                                                   text_a = x[DATA_COLUMN], 
+                                                                   text_b = None, 
+                                                                   label = x[LABEL_COLUMN]), axis = 1)
+
+test_InputExamples = test.apply(lambda x: bert.run_classifier.InputExample(guid=None, 
+                                                                   text_a = x[DATA_COLUMN], 
+                                                                   text_b = None, 
+                                                                   label = x[LABEL_COLUMN]), axis = 1)
+
+
+
+#%%
+'''Transform data to match BERT pre-trained data '''
+
+# Load the pre-trained uncased model from tensorflow hub
+
+BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
+
+def create_tokenizer_from_hub_module():
+  """Get the vocab file and casing info from the Hub module."""
+  with tf.Graph().as_default():
+    bert_module = hub.Module(BERT_MODEL_HUB)
+    tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
+    with tf.Session() as sess:
+      vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
+                                            tokenization_info["do_lower_case"]])
+      
+  return bert.tokenization.FullTokenizer(
+      vocab_file=vocab_file, do_lower_case=do_lower_case)
+
+tokenizer = create_tokenizer_from_hub_module()
 
 #%%
