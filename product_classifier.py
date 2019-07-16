@@ -118,3 +118,27 @@ MAX_SEQ_LENGTH = 100
 
 train_features = bert.run_classifier.convert_examples_to_features(train_InputExamples, label_list, MAX_SEQ_LENGTH, tokenizer)
 test_features = bert.run_classifier.convert_examples_to_features(test_InputExamples, label_list, MAX_SEQ_LENGTH, tokenizer)
+
+#%%
+'''Create the BERT classification model'''
+
+  """build classification model."""
+
+def build_model(is_predicting, input_ids, input_mask, segment_ids, labels,
+                 num_labels):
+
+  bert_module = hub.Module(
+      BERT_MODEL_HUB,
+      trainable=True)
+
+  bert_inputs = dict(
+      input_ids=input_ids,
+      input_mask=input_mask,
+      segment_ids=segment_ids)
+
+  bert_outputs = bert_module(
+      inputs=bert_inputs,
+      signature="tokens",
+      as_dict=True)
+
+      
