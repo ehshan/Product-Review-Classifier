@@ -77,14 +77,14 @@ label_list = [1, 2, 3, 4, 5]
 
 # Use the InputExample class from BERT's run_classifier code to create examples from the data
 train_InputExamples = train.apply(lambda x: bert.run_classifier.InputExample(guid=None,
-                                                                   text_a = x[DATA_COLUMN], 
-                                                                   text_b = None, 
-                                                                   label = x[LABEL_COLUMN]), axis = 1)
+                                                                   	text_a = x[DATA_COLUMN], 
+                                                                   	text_b = None, 
+                                                                   	label = x[LABEL_COLUMN]), axis = 1)
 
 test_InputExamples = test.apply(lambda x: bert.run_classifier.InputExample(guid=None, 
-                                                                   text_a = x[DATA_COLUMN], 
-                                                                   text_b = None, 
-                                                                   label = x[LABEL_COLUMN]), axis = 1)
+                                                                   	text_a = x[DATA_COLUMN], 
+                                                                   	text_b = None, 
+                                                                   	label = x[LABEL_COLUMN]), axis = 1)
 
 
 
@@ -96,16 +96,16 @@ test_InputExamples = test.apply(lambda x: bert.run_classifier.InputExample(guid=
 BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
 
 def create_tokenizer_from_hub_module():
-  """Get the vocab file and casing info from the Hub module."""
-  with tf.Graph().as_default():
-    bert_module = hub.Module(BERT_MODEL_HUB)
-    tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
-    with tf.Session() as sess:
-      vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
+  	"""Get the vocab file and casing info from the Hub module."""
+  	with tf.Graph().as_default():
+    	bert_module = hub.Module(BERT_MODEL_HUB)
+    	tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
+    	with tf.Session() as sess:
+      	vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
                                             tokenization_info["do_lower_case"]])
       
   return bert.tokenization.FullTokenizer(
-      vocab_file=vocab_file, do_lower_case=do_lower_case)
+      	vocab_file=vocab_file, do_lower_case=do_lower_case)
 
 tokenizer = create_tokenizer_from_hub_module()
 
@@ -124,21 +124,23 @@ test_features = bert.run_classifier.convert_examples_to_features(test_InputExamp
 
   """build classification model."""
 
-def build_model(is_predicting, input_ids, input_mask, segment_ids, labels,
+def build_model(predicting, input_ids, input_mask, segment_ids, labels,
                  num_labels):
 
-  bert_module = hub.Module(
-      BERT_MODEL_HUB,
-      trainable=True)
+  	bert_module = hub.Module(
+      	BERT_MODEL_HUB,
+      	trainable=True)
 
-  bert_inputs = dict(
-      input_ids=input_ids,
-      input_mask=input_mask,
-      segment_ids=segment_ids)
+  	bert_inputs = dict(
+      	input_ids=input_ids,
+      	input_mask=input_mask,
+      	segment_ids=segment_ids)
 
-  bert_outputs = bert_module(
-      inputs=bert_inputs,
-      signature="tokens",
-      as_dict=True)
+  	bert_outputs = bert_module(
+    	inputs=bert_inputs,
+      	signature="tokens",
+      	as_dict=True)
+
+
 
       
