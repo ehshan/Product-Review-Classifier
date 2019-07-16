@@ -127,7 +127,8 @@ test_features = bert.run_classifier.convert_examples_to_features(test_InputExamp
 def build_model(predicting, input_ids, input_mask, segment_ids, labels,
                  num_labels):
 
-	# model arch
+	'''model architecture config'''
+
 	bert_module = hub.Module(
       	BERT_MODEL_HUB,
       	trainable=True)
@@ -143,6 +144,8 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
       	as_dict=True)
 
 
+    '''layer config'''
+
 	# Will classify entire sentence over all labels
   	output_layer = bert_outputs["pooled_output"]
   	hidden_size = output_layer.shape[-1].value
@@ -153,10 +156,35 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
          initializer=tf.truncated_normal_initializer(stddev=0.02))
 
     output_bias = tf.get_variable(
-        "output_bias", [num_labels], initializer=tf.zeros_initializer())	  
-
-								  
+        "output_bias", [num_labels], initializer=tf.zeros_initializer())	 
 
 
+   '''training/inference config'''
+
+    with tf.variable_scope("loss"):
+
+        # Add layer dropout of 0.1 per layer 
+        output_layer = tf.nn.dropout(output_layer, keep_prob=0.9)
+
+        logits = tf.matmul(output_layer, output_weights, transpose_b=True)
+        logits = tf.nn.bias_add(logits, output_bias)
+        log_probs = tf.nn.log_softmax(logits, axis=-1)
+
+        # Convert labels into one-hot encoding
+        one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
+
+        predicted_labels = tf.squeeze(tf.argmax(log_probs, axis=-1, output_type=tf.int32))
+        
+        # when prediction will output labels and proabilities 
+        if predicting:
+            # can change depending on desired feedback
+            return (predicted_labels, log_probs) 
+
+        # when trainng modle willcompute loss between predicted and actual label
+        per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
+        loss = tf.reduce_mean(per_example_loss)
+
+        return (loss, predicted_labels, log_probs)
+     
 
       
