@@ -127,7 +127,8 @@ test_features = bert.run_classifier.convert_examples_to_features(test_InputExamp
 def build_model(predicting, input_ids, input_mask, segment_ids, labels,
                  num_labels):
 
-  	bert_module = hub.Module(
+	# model arch
+	bert_module = hub.Module(
       	BERT_MODEL_HUB,
       	trainable=True)
 
@@ -140,6 +141,21 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
     	inputs=bert_inputs,
       	signature="tokens",
       	as_dict=True)
+
+
+	# Will classify entire sentence over all labels
+  	output_layer = bert_outputs["pooled_output"]
+  	hidden_size = output_layer.shape[-1].value
+
+    # initialise layer weights & bias
+    output_weights = tf.get_variable(
+        "output_weights", [num_labels, hidden_size],
+         initializer=tf.truncated_normal_initializer(stddev=0.02))
+
+    output_bias = tf.get_variable(
+        "output_bias", [num_labels], initializer=tf.zeros_initializer())	  
+
+								  
 
 
 
