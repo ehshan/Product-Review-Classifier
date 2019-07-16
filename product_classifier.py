@@ -116,6 +116,5 @@ tokenizer = create_tokenizer_from_hub_module()
 # set max sequence length
 MAX_SEQ_LENGTH = 100
 
-# Convert our train and test features to InputFeatures that BERT understands.
 train_features = bert.run_classifier.convert_examples_to_features(train_InputExamples, label_list, MAX_SEQ_LENGTH, tokenizer)
-test_features = bert.run
+test_features = bert.run_classifier.convert_examples_to_features(test_InputExamples, label_list, MAX_SEQ_LENGTH, tokenizer)
