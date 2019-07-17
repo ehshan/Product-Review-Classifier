@@ -203,6 +203,20 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps
 
         is_predicting = (mode == tf.estimator.ModeKeys.PREDICT)
 
+    '''TODO - evalution function'''
+
     # return the function
     return model_fn    
-         
+
+#%%
+'''Set training hyperpramameters'''
+
+LEARNING_RATE = 2e-5
+NUM_TRAIN_EPOCHS = 3.0
+WARMUP_PROPORTION = 0.1
+
+# Model checkpoints
+SAVE_CHECKPOINTS_STEPS = 500
+SAVE_SUMMARY_STEPS = 100         
+
+'''TODO - save complete trained BERT model'''
