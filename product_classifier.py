@@ -235,3 +235,19 @@ run_config = tf.estimator.RunConfig(
     model_dir=OUTPUT_DIR,
     save_summary_steps=SAVE_SUMMARY_STEPS,
     save_checkpoints_steps=SAVE_CHECKPOINTS_STEPS)
+
+
+#%%
+'''Define the Model Object'''
+
+model_fn = model_fn_builder(
+  num_labels=len(label_list),
+  learning_rate=LEARNING_RATE,
+  num_train_steps=num_train_steps,
+  num_warmup_steps=num_warmup_steps)
+
+estimator = tf.estimator.Estimator(
+  model_fn=model_fn,
+  config=run_config,
+  params={"batch_size": BATCH_SIZE})
+    
