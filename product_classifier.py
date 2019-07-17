@@ -187,4 +187,22 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
         return (loss, predicted_labels, log_probs)
      
 
-      
+#%%
+ '''Create the training and prediction functions'''
+
+def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps):
+  
+    """Returns `model_fn` closure for TPUEstimator."""
+    def model_fn(features, labels, mode, params):  # pylint: disable=unused-argument
+        """The `model_fn` for TPUEstimator."""
+
+        input_ids = features["input_ids"]
+        input_mask = features["input_mask"]
+        segment_ids = features["segment_ids"]
+        label_ids = features["label_ids"]
+
+        is_predicting = (mode == tf.estimator.ModeKeys.PREDICT)
+
+    # return the function
+    return model_fn    
+         
