@@ -220,3 +220,10 @@ SAVE_CHECKPOINTS_STEPS = 500
 SAVE_SUMMARY_STEPS = 100         
 
 '''TODO - save complete trained BERT model'''
+
+#%%
+#%%
+'''Define number of step in training process'''
+
+num_train_steps = int(len(train_features) / BATCH_SIZE * NUM_TRAIN_EPOCHS)
+num_warmup_steps = int(num_train_steps * WARMUP_PROPORTION)
