@@ -250,4 +250,12 @@ estimator = tf.estimator.Estimator(
   model_fn=model_fn,
   config=run_config,
   params={"batch_size": BATCH_SIZE})
-    
+
+#%%
+#%%
+'''Define the Training Input Function'''
+
+train_input_fn = bert.run_classifier.input_fn_builder(
+    features=train_features,
+    seq_length=MAX_SEQ_LENGTH,
+    is_training=True)    
