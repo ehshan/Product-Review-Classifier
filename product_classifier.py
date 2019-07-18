@@ -259,3 +259,12 @@ train_input_fn = bert.run_classifier.input_fn_builder(
     features=train_features,
     seq_length=MAX_SEQ_LENGTH,
     is_training=True)    
+
+#%%
+'''Train Model'''
+
+print(f'Trainig Classifier')
+current_time = datetime.now()
+estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
+print('{}{}'.format("Training took time ", datetime.now() - current_time))    
+
