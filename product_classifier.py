@@ -3,7 +3,6 @@
 ## BERT Classifier for Product Reviews
 
 #%%
-#%%
 '''Import Dependencies'''
 
 from sklearn.model_selection import train_test_split
@@ -96,16 +95,18 @@ test_InputExamples = test.apply(lambda x: bert.run_classifier.InputExample(guid=
 BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
 
 def create_tokenizer_from_hub_module():
-  	"""Get the vocab file and casing info from the Hub module."""
-  	with tf.Graph().as_default():
-    	bert_module = hub.Module(BERT_MODEL_HUB)
-    	tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
-    	with tf.Session() as sess:
-      	vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
-                                            tokenization_info["do_lower_case"]])
+    """Get the vocab file and casing info from the Hub module"""
       
-  return bert.tokenization.FullTokenizer(
-      	vocab_file=vocab_file, do_lower_case=do_lower_case)
+    with tf.Graph().as_default():
+        bert_module = hub.Module(BERT_MODEL_HUB)
+        tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
+      
+        with tf.Session() as sess:
+            vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
+                                            tokenization_info["do_lower_case"]])
+    
+    return bert.tokenization.FullTokenizer(
+        vocab_file=vocab_file, do_lower_case=do_lower_case)
 
 tokenizer = create_tokenizer_from_hub_module()
 
@@ -130,18 +131,18 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
 	'''model architecture config'''
 
 	bert_module = hub.Module(
-      	BERT_MODEL_HUB,
-      	trainable=True)
+        BERT_MODEL_HUB,
+        trainable=True)
 
-  	bert_inputs = dict(
-      	input_ids=input_ids,
-      	input_mask=input_mask,
-      	segment_ids=segment_ids)
+    bert_inputs = dict(
+        input_ids=input_ids,
+        input_mask=input_mask,
+        segment_ids=segment_ids)
 
-  	bert_outputs = bert_module(
-    	inputs=bert_inputs,
-      	signature="tokens",
-      	as_dict=True)
+    bert_outputs = bert_module(
+        inputs=bert_inputs,
+        signature="tokens",
+        as_dict=True)
 
 
     '''layer config'''
@@ -210,7 +211,7 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps
 
 #%%
 '''Set training hyperpramameters'''
-
+BATCH_SIZE = 32
 LEARNING_RATE = 2e-5
 NUM_TRAIN_EPOCHS = 3.0
 WARMUP_PROPORTION = 0.1
@@ -251,14 +252,15 @@ estimator = tf.estimator.Estimator(
   config=run_config,
   params={"batch_size": BATCH_SIZE})
 
-#%%
+
 #%%
 '''Define the Training Input Function'''
 
 train_input_fn = bert.run_classifier.input_fn_builder(
     features=train_features,
     seq_length=MAX_SEQ_LENGTH,
-    is_training=True)    
+    is_training=True,
+    drop_remainder=False)  
 
 #%%
 '''Train Model'''
@@ -267,4 +269,3 @@ print(f'Trainig Classifier')
 current_time = datetime.now()
 estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
 print('{}{}'.format("Training took time ", datetime.now() - current_time))    
-
