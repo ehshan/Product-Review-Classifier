@@ -128,9 +128,9 @@ test_features = bert.run_classifier.convert_examples_to_features(test_InputExamp
 def build_model(predicting, input_ids, input_mask, segment_ids, labels,
                  num_labels):
 
-	'''model architecture config'''
+    """Model Architecture Config"""
 
-	bert_module = hub.Module(
+    bert_module = hub.Module(
         BERT_MODEL_HUB,
         trainable=True)
 
@@ -145,26 +145,26 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
         as_dict=True)
 
 
-    '''layer config'''
+    '''Layer Config'''
 
-	# Will classify entire sentence over all labels
-  	output_layer = bert_outputs["pooled_output"]
-  	hidden_size = output_layer.shape[-1].value
+    # Will classify sentence over all labels
+    output_layer = bert_outputs["pooled_output"]
+    hidden_size = output_layer.shape[-1].value
 
-    # initialise layer weights & bias
+    # initialise layer weights and bias
     output_weights = tf.get_variable(
         "output_weights", [num_labels, hidden_size],
-         initializer=tf.truncated_normal_initializer(stddev=0.02))
+        initializer=tf.truncated_normal_initializer(stddev=0.02))
 
     output_bias = tf.get_variable(
-        "output_bias", [num_labels], initializer=tf.zeros_initializer())	 
+        "output_bias", [num_labels], initializer=tf.zeros_initializer())
 
-
-   '''training/inference config'''
+    
+    '''Output Config'''
 
     with tf.variable_scope("loss"):
 
-        # Add layer dropout of 0.1 per layer 
+        # Add layer dropout to 0.1 per layer
         output_layer = tf.nn.dropout(output_layer, keep_prob=0.9)
 
         logits = tf.matmul(output_layer, output_weights, transpose_b=True)
@@ -176,15 +176,16 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
 
         predicted_labels = tf.squeeze(tf.argmax(log_probs, axis=-1, output_type=tf.int32))
         
-        # when prediction will output labels and proabilities 
+        # when predicting model will output label and probability
         if predicting:
-            return (predicted_labels, log_probs) 
+            return (predicted_labels, log_probs)
 
-        # when trainng modle willcompute loss between predicted and actual label
+        # When training/eval model will output loss
         per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
         loss = tf.reduce_mean(per_example_loss)
         return (loss, predicted_labels, log_probs)
-     
+
+
 
 #%%
  '''Create the training and prediction functions'''
@@ -296,4 +297,4 @@ train_input_fn = bert.run_classifier.input_fn_builder(
 print(f'Trainig Classifier')
 current_time = datetime.now()
 estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
-print('{}{}'.format("Training took time ", datetime.now() - current_time))
+print('{}{}'.format("Training took time ", datetime.now() - current_time))    
