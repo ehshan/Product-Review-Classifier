@@ -2,6 +2,12 @@
 
 ## BERT Classifier for Product Reviews
 
+#%%[markdown]
+
+### Create Enviroment
+
+'''TODO: Docker machine learning enviroment'''
+
 #%%
 '''Import Dependencies'''
 
@@ -12,7 +18,6 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from datetime import datetime
 
-'''TODO: Docker machine learning enviroment'''
 
 #%%
 '''Import BERT'''
@@ -35,6 +40,11 @@ import re
 
 train_out = 'train_out'
 OUTPUT_DIR = train_out
+
+
+#%%[markdown]
+
+### Download, Clean & Process Data
 
 #%%
 
@@ -121,7 +131,11 @@ train_features = bert.run_classifier.convert_examples_to_features(train_InputExa
 test_features = bert.run_classifier.convert_examples_to_features(test_InputExamples, label_list, MAX_SEQ_LENGTH, tokenizer)
 
 
-#%%
+#%%[markdown]
+
+### Create the Model
+
+
 #%%
 '''Create the BERT classification model'''
 
@@ -237,6 +251,10 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps
 
     # return the function
     return model_fn    
+
+#%%[markdown]
+
+### Set the Training Enviroment
 
 #%%
 '''Set training hyperpramameters'''
