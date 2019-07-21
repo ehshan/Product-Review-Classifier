@@ -120,10 +120,10 @@ MAX_SEQ_LENGTH = 100
 train_features = bert.run_classifier.convert_examples_to_features(train_InputExamples, label_list, MAX_SEQ_LENGTH, tokenizer)
 test_features = bert.run_classifier.convert_examples_to_features(test_InputExamples, label_list, MAX_SEQ_LENGTH, tokenizer)
 
+
+#%%
 #%%
 '''Create the BERT classification model'''
-
-  """build classification model."""
 
 def build_model(predicting, input_ids, input_mask, segment_ids, labels,
                  num_labels):
@@ -178,13 +178,11 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
         
         # when prediction will output labels and proabilities 
         if predicting:
-            # can change depending on desired feedback
             return (predicted_labels, log_probs) 
 
         # when trainng modle willcompute loss between predicted and actual label
         per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
         loss = tf.reduce_mean(per_example_loss)
-
         return (loss, predicted_labels, log_probs)
      
 
@@ -193,18 +191,48 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
 
 def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps):
   
-    """Returns `model_fn` closure for TPUEstimator."""
-    def model_fn(features, labels, mode, params):  # pylint: disable=unused-argument
-        """The `model_fn` for TPUEstimator."""
+    """Model function for training, evaluation and predictions"""
+
+    def model_fn(features, labels, mode, params): 
 
         input_ids = features["input_ids"]
         input_mask = features["input_mask"]
         segment_ids = features["segment_ids"]
         label_ids = features["label_ids"]
 
-        is_predicting = (mode == tf.estimator.ModeKeys.PREDICT)
+        
+        '''prediction function'''
 
-    '''TODO - evalution function'''
+        predicting = (mode == tf.estimator.ModeKeys.PREDICT)
+
+        '''training and evalution function'''
+        
+        if not predicting:
+
+            (loss, predicted_labels, log_probs) = build_model(
+                predicting, input_ids, input_mask, segment_ids, label_ids, num_labels)
+
+            train_op = bert.optimization.create_optimizer(
+                loss, learning_rate, num_train_steps, num_warmup_steps, use_tpu=False)
+
+
+            if mode == tf.estimator.ModeKeys.TRAIN:
+                return tf.estimator.EstimatorSpec(mode=mode,
+                loss=loss,
+                train_op=train_op)
+            else:
+                return tf.estimator.EstimatorSpec(mode=mode,
+                loss=loss,
+                eval_metric_ops=eval_metrics)
+        else:
+            (predicted_labels, log_probs) = build_model(
+                predicting, input_ids, input_mask, segment_ids, label_ids, num_labels)
+
+            predictions = {
+                'probabilities': log_probs,
+                'labels': predicted_labels
+                }
+        return tf.estimator.EstimatorSpec(mode, predictions=predictions)
 
     # return the function
     return model_fn    
@@ -268,4 +296,4 @@ train_input_fn = bert.run_classifier.input_fn_builder(
 print(f'Trainig Classifier')
 current_time = datetime.now()
 estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
-print('{}{}'.format("Training took time ", datetime.now() - current_time))    
+print('{}{}'.format("Training took time ", datetime.now() - current_time))
