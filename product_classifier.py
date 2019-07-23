@@ -233,45 +233,47 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps
 
             '''define model eval metrics'''
 
-            def metric_fn(label_ids, predicted_labels):
-                accuracy = tf.metrics.accuracy(label_ids, predicted_labels)
-                f1_score = tf.contrib.metrics.f1_score(
-                    label_ids,
-                    predicted_labels)
-                auc = tf.metrics.auc(
-                    label_ids,
-                    predicted_labels)
-                recall = tf.metrics.recall(
-                    label_ids,
-                    predicted_labels)
-                precision = tf.metrics.precision(
-                    label_ids,
-                    predicted_labels) 
-                true_pos = tf.metrics.true_positives(
-                    label_ids,
-                    predicted_labels)
-                true_neg = tf.metrics.true_negatives(
-                    label_ids,
-                    predicted_labels)   
-                false_pos = tf.metrics.false_positives(
-                    label_ids,
-                    predicted_labels)  
-                false_neg = tf.metrics.false_negatives(
-                    label_ids,
-                    predicted_labels)
-                return {
-                    "eval_accuracy": accuracy,
-                    "f1_score": f1_score,
-                    "auc": auc,
-                    "precision": precision,
-                    "recall": recall,
-                    "true_positives": true_pos,
-                    "true_negatives": true_neg,
-                    "false_positives": false_pos,
-                    "false_negatives": false_neg
-                }
+            '''TODO rewrite for multi-class'''
 
-            eval_metrics = metric_fn(label_ids, predicted_labels)
+            # def metric_fn(label_ids, predicted_labels):
+            #     accuracy = tf.metrics.accuracy(label_ids, predicted_labels)
+            #     f1_score = tf.contrib.metrics.f1_score(
+            #         label_ids,
+            #         predicted_labels)
+            #     auc = tf.metrics.auc(
+            #         label_ids,
+            #         predicted_labels)
+            #     recall = tf.metrics.recall(
+            #         label_ids,
+            #         predicted_labels)
+            #     precision = tf.metrics.precision(
+            #         label_ids,
+            #         predicted_labels) 
+            #     true_pos = tf.metrics.true_positives(
+            #         label_ids,
+            #         predicted_labels)
+            #     true_neg = tf.metrics.true_negatives(
+            #         label_ids,
+            #         predicted_labels)   
+            #     false_pos = tf.metrics.false_positives(
+            #         label_ids,
+            #         predicted_labels)  
+            #     false_neg = tf.metrics.false_negatives(
+            #         label_ids,
+            #         predicted_labels)
+            #     return {
+            #         "eval_accuracy": accuracy,
+            #         "f1_score": f1_score,
+            #         "auc": auc,
+            #         "precision": precision,
+            #         "recall": recall,
+            #         "true_positives": true_pos,
+            #         "true_negatives": true_neg,
+            #         "false_positives": false_pos,
+            #         "false_negatives": false_neg
+            #     }
+
+            # eval_metrics = metric_fn(label_ids, predicted_labels)
 
 
             if mode == tf.estimator.ModeKeys.TRAIN:
@@ -280,8 +282,8 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps
                 train_op=train_op)
             else:
                 return tf.estimator.EstimatorSpec(mode=mode,
-                loss=loss,
-                eval_metric_ops=eval_metrics)
+                loss=loss)
+                #eval_metric_ops=eval_metrics)
         else:
             (predicted_labels, log_probs) = build_model(
                 predicting, input_ids, input_mask, segment_ids, label_ids, num_labels)
