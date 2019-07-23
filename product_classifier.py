@@ -272,7 +272,7 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps
                 }
 
             eval_metrics = metric_fn(label_ids, predicted_labels)
-            
+
 
             if mode == tf.estimator.ModeKeys.TRAIN:
                 return tf.estimator.EstimatorSpec(mode=mode,
@@ -352,10 +352,29 @@ train_input_fn = bert.run_classifier.input_fn_builder(
     is_training=True,
     drop_remainder=False)  
 
+
+#%%[markdown]
+
+### Train the Model
+
 #%%
 '''Train Model'''
 
-print(f'Trainig Classifier')
+print(f'Training Classifier')
 current_time = datetime.now()
 estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
 print('{}{}'.format("Training took time ", datetime.now() - current_time))    
+
+
+#%%[markdown]
+
+### Test the Model
+
+#%%
+'''Create the test function'''
+
+test_input_fn = run_classifier.input_fn_builder(
+    features=test_features,
+    seq_length=MAX_SEQ_LENGTH,
+    is_training=False,
+    drop_remainder=False)
