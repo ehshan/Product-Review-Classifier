@@ -378,3 +378,9 @@ test_input_fn = run_classifier.input_fn_builder(
     seq_length=MAX_SEQ_LENGTH,
     is_training=False,
     drop_remainder=False)
+
+#%%
+'''Test Model'''
+
+estimator.evaluate(input_fn=test_input_fn, steps=None)    
+
