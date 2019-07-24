@@ -386,3 +386,20 @@ test_input_fn = run_classifier.input_fn_builder(
 
 estimator.evaluate(input_fn=test_input_fn, steps=None)    
 
+
+#%%[markdown]
+
+## Get Model Predictions
+
+#%%
+
+'''Function to get predictions from trained model'''
+
+def predict_class(sentences):
+    labels = ['1', '2', '3', '4', '5']
+    input_examples = [run_classifier.InputExample(guid="", text_a = x, text_b = None, label = 4) for x in sentences]
+    input_features = run_classifier.convert_examples_to_features(input_examples, label_list, MAX_SEQ_LENGTH, tokenizer)
+    predict_input_fn = run_classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
+    predictions = estimator.predict(predict_input_fn)
+    return [(sentence, prediction['probabilities'], labels[prediction['labels']]) for sentence, prediction in zip(sentences, predictions)]
+
