@@ -403,3 +403,23 @@ def predict_class(sentences):
     predictions = estimator.predict(predict_input_fn)
     return [(sentence, prediction['probabilities'], labels[prediction['labels']]) for sentence, prediction in zip(sentences, predictions)]
 
+#%%
+'''Sample Reviews to Test'''
+
+sample_reviews = [
+    "Awesome customer service and a cool little drone! Especially for the price",
+    "Really liked these. They were a little larger than I thought, but still fun",
+    "Showed up not how it's shown. Was someone's old toy with paint on it",
+    "Got a wrong product from Amazon Vine and unable to provide a good review"
+]
+
+
+#%%
+'''Make Predictions'''
+
+predictions = predict_class(sample_reviews)
+
+predictions
+
+
+#%%
