@@ -403,6 +403,7 @@ def predict_class(sentences):
     predictions = estimator.predict(predict_input_fn)
     return [(sentence, prediction['probabilities'], labels[prediction['labels']]) for sentence, prediction in zip(sentences, predictions)]
 
+
 #%%
 '''Sample Reviews to Test'''
 
@@ -413,13 +414,9 @@ sample_reviews = [
     "Got a wrong product from Amazon Vine and unable to provide a good review"
 ]
 
-
 #%%
 '''Make Predictions'''
 
 predictions = predict_class(sample_reviews)
 
 predictions
-
-
-#%%
