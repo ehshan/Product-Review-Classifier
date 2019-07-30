@@ -93,6 +93,11 @@ def load_data_from_remote(force_download = False):
 df = load_data_from_remote()
 train, test = train_test_split(df, test_size=0.2)
 
+# Sample subset of data 
+train = train.sample(10000)
+test = test.sample(2000) 
+
+print(train.head(5))
 
 
 #%%
