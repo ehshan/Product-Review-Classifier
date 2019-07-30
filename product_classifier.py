@@ -58,19 +58,41 @@ def load_data_from_remote(force_download = False):
         origin = "https://s3.amazonaws.com/amazon-reviews-pds/tsv/sample_us.tsv", 
         extract = False)
     
+
     # relevant fields from data
-    fields = ['review_id', 'star_rating', 'review_body']
+    fields = ['star_rating', 'review_body']
     
     # read data to df
-    df = pd.read_csv(dataset, sep='\t', header=0, skipinitialspace=True, usecols=fields)
+    df = pd.read_csv(dataset, sep='\t', header=0, skipinitialspace=True, usecols=fields, encoding='utf-8')
+
+
+    '''Cast column text to lower case'''    
+
+    def txt_to_lower(df_name, column_name):    
+        # create df to merge
+        df_2 = df_name.drop(column_name, 1)        
+        # convert review body to lowercase   
+        df_1 = df_name[column_name].str.lower()
+        # merge df
+        df3 =  pd.merge(df_2, df_1, left_index=True, right_index=True)
+
+        return df3
+
+    
+    df = txt_to_lower(df, 'review_body')
+    
+    # remove null values
+    df = df.dropna()
 
     return df
+
 
 #%%
 '''Spit data to train/test sets '''
 
 df = load_data_from_remote()
 train, test = train_test_split(df, test_size=0.2)
+
 
 
 #%%
@@ -117,6 +139,7 @@ def create_tokenizer_from_hub_module():
     
     return bert.tokenization.FullTokenizer(
         vocab_file=vocab_file, do_lower_case=do_lower_case)
+
 
 tokenizer = create_tokenizer_from_hub_module()
 
@@ -202,7 +225,7 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
 
 
 #%%
- '''Create the training and prediction functions'''
+'''Create the training and prediction functions'''
 
 def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps):
   
