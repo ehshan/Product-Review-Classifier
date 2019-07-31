@@ -54,10 +54,10 @@ def load_data_from_remote(force_download = False):
     
     # load data from url
     dataset = tf.keras.utils.get_file(
-        fname = "sample_us.tsv", 
-        origin = "https://s3.amazonaws.com/amazon-reviews-pds/tsv/sample_us.tsv", 
-        extract = False)
-    
+        fname = "amazon_reviews_us_Toys_v1_00.tsv.gz", 
+        origin = "https://s3.amazonaws.com/amazon-reviews-pds/tsv/amazon_reviews_us_Toys_v1_00.tsv.gz", 
+        extract = True)
+        
 
     # relevant fields from data
     fields = ['star_rating', 'review_body']
