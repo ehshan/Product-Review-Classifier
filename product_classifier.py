@@ -281,8 +281,8 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps
 
             '''TODO rewrite for multi-class'''
 
-            def metrics(labels, predicted):
-                accuarcy = 1
+            def metrics_fn(labels, predicted):
+                accuracy = 1
                 f1_score = 1
                 auc = 1
                 recall = 1
@@ -313,7 +313,7 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps
             else:
                 return tf.estimator.EstimatorSpec(mode=mode,
                 loss=loss)
-                #eval_metric_ops=eval_metrics)
+                eval_metric_ops=eval_metrics)
         else:
             (predicted_labels, log_probs) = build_model(
                 predicting, input_ids, input_mask, segment_ids, label_ids, num_labels)
