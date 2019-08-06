@@ -2,3 +2,4 @@
 train_out
 samples
 product_classifier.db
+__pycache__
