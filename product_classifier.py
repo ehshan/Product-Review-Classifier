@@ -302,7 +302,7 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps, num_warmup_step
             else:
                 return tf.estimator.EstimatorSpec(mode=mode,
                 loss=loss)
-                eval_metric_ops=eval_metrics)
+                #eval_metric_ops=eval_metrics)
         else:
             (predicted_labels, log_probs) = build_model(
                 predicting, input_ids, input_mask, segment_ids, label_ids, num_labels)
