@@ -84,4 +84,35 @@ sample_predictions = predict_class(review_samples)
 
 sample_predictions
 
+#%%[markdown]
+
+### Save the trained estimator
+
 #%%
+'''Save Estimator '''
+
+'''TODO: Fix issue with feature_spec datatypes'''
+
+def serving_input_receiver_fn():
+
+    feature_spec = {
+        "input_ids" : tf.FixedLenFeature([MAX_SEQ_LENGTH], tf.int64),
+        "input_mask" : tf.FixedLenFeature([MAX_SEQ_LENGTH], tf.int64),
+        "segment_ids" : tf.FixedLenFeature([MAX_SEQ_LENGTH], tf.int64),
+        "label_ids" :  tf.FixedLenFeature([], tf.int64)
+    }
+
+    serialized_tf_example = tf.placeholder(dtype=tf.string, shape=[None], name='input_example_tensor')
+    print(serialized_tf_example.shape)
+
+    receiver_tensors = {'example': serialized_tf_example}
+    
+    features = tf.parse_example(serialized_tf_example, feature_spec)
+    
+    return tf.estimator.export.ServingInputReceiver(features, receiver_tensors)
+
+
+estimator._export_to_tpu = False  
+
+estimator.export_saved_model(export_dir_base = OUTPUT_DIR , serving_input_receiver_fn = serving_input_receiver_fn)
+	
