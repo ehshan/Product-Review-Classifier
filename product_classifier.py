@@ -270,7 +270,7 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps, num_warmup_step
 
             '''TODO rewrite for multi-class'''
 
-            def metrics_fn(labels, predicted):
+            def metric_fn(labels, predicted):
                 accuracy = 1
                 f1_score = 1
                 auc = 1
