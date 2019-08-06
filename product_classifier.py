@@ -239,7 +239,7 @@ def build_model(predicting, input_ids, input_mask, segment_ids, labels,
 #%%
 '''Create the training and prediction functions'''
 
-def model_fn_builder(num_labels, learning_rate, num_train_steps,num_warmup_steps):
+def model_fn_builder(num_labels, learning_rate, num_train_steps, num_warmup_steps):
   
     """Model function for training, evaluation and predictions"""
 
@@ -439,3 +439,50 @@ sample_reviews = [
 predictions = predict_class(sample_reviews)
 
 predictions
+
+
+#%%
+'''Save Estimator '''
+
+def serving_input_receiver_fn():
+
+    feature_spec = {
+        "input_ids" : tf.FixedLenFeature([MAX_SEQ_LENGTH], tf.int64),
+        "input_mask" : tf.FixedLenFeature([MAX_SEQ_LENGTH], tf.int64),
+        "segment_ids" : tf.FixedLenFeature([MAX_SEQ_LENGTH], tf.int64),
+        "label_ids" :  tf.FixedLenFeature([], tf.int64)
+    }
+
+    serialized_tf_example = tf.placeholder(dtype=tf.string, shape=[None], name='input_example_tensor')
+    print(serialized_tf_example.shape)
+
+    receiver_tensors = {'example': serialized_tf_example}
+    
+    features = tf.parse_example(serialized_tf_example, feature_spec)
+    
+    return tf.estimator.export.ServingInputReceiver(features, receiver_tensors)
+
+export_path = '/content/drive/My Drive/binary_class/bert/'
+
+estimator._export_to_tpu = False  
+
+estimator.export_saved_model(export_dir_base = export_path, serving_input_receiver_fn = serving_input_receiver_fn)
+
+
+#%%
+''' Dump all session variables '''
+import dill
+
+dill.dump_session('trained_toy_model.db')
+
+#%%
+feature_spec = {
+    input_ids = features["input_ids"]
+    input_mask = features["input_mask"]
+    segment_ids = features["segment_ids"]
+    label_ids = features["label_ids"]
+}
+    
+
+
+#%%
